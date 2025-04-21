@@ -1,6 +1,6 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-	Name = "Anime Rangers X",
+	Name = "S001 - AnimeRangersX",
 	Icon = 0,
 	LoadingTitle = "Loading...",
 	LoadingSubtitle = "by S001",
@@ -21,7 +21,7 @@ local Window = Rayfield:CreateWindow({
 	  RememberJoins = true
 	},
 
-	KeySystem = true,
+	KeySystem = false,
 	KeySettings = {
 	  Title = "S001 Key",
 	  Subtitle = "S001 Key System",
@@ -58,12 +58,9 @@ local AutoJoinChallengeOn = false
 local AutoRetryOn = false
 local AutoClickOn = false
 local AutoVoteOn = false
---
+local AutoNextOn = false
 
--- Main
-local Tab = Window:CreateTab("Main Lobby", "anchor")
-local Section = Tab:CreateSection("Quests")
-
+-- Ranger Stage Variables
 local AutoJoinChallengeOn = false
 local AutoJoinRangerStage = false
 
@@ -80,6 +77,62 @@ local AllWorlds = {
 	["Naruto"] = Naruto_RangerStage, 
 	["OPM"] = OPM_RangerStage,
 }
+--
+
+-- Main
+local Tab = Window:CreateTab("Main Lobby", "anchor")
+local Section = Tab:CreateSection("Main")
+
+-- Auto Vote
+local Toggle = Tab:CreateToggle({
+    Name = "Auto Vote",
+    CurrentValue = false,
+    Flag = "AutoVote",
+    Callback = function(AutoVoteEnabled)
+        AutoVoteOn = AutoVoteEnabled
+        while AutoVoteOn do
+            wait(1)
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
+        end
+    end,
+})
+
+-- Auto Next
+local Toggle = Tab:CreateToggle({
+    Name = "Auto Next",
+    CurrentValue = false,
+    Flag = "AutoNext",
+    Callback = function(AutoNextEnabled)
+        AutoNextOn = AutoNextEnabled
+        while AutoNextOn do
+            wait(1)
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
+        end
+    end,
+})
+
+-- Auto Retry
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Retry",
+	CurrentValue = false,
+	Flag = "AutoRetry",
+	Callback = function(AutoRetryEnabled)
+    
+        AutoRetryOn = AutoRetryEnabled
+
+        while AutoRetryOn do
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
+            wait(1)
+        end
+        
+        Rayfield:Notify({
+        Title = "Retry",
+        Content = "Retry",
+        Duration = 1,
+        Image = "anchor",
+        })
+    end,
+})
 
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Ranger Stage",
@@ -88,7 +141,7 @@ local Toggle = Tab:CreateToggle({
     Callback = function(AutoJoinRangerStageEnabled)
         AutoJoinRangerStageOn = AutoJoinRangerStageEnabled
 
-        if AutoJoinRangerStageOn and not LocalPlayer.PlayerGui.HUD.Enabled then
+        if AutoJoinRangerStageOn and LocalPlayer.PlayerGui.HUD.Enabled then
             -- Open PlayRoom
             PlayRoom.Enabled = true
 
@@ -157,62 +210,8 @@ local Toggle = Tab:CreateToggle({
 	end,
 })
 
--- Auto Retry
-local Toggle = Tab:CreateToggle({
-	Name = "Auto Retry",
-	CurrentValue = false,
-	Flag = "AutoRetry",
-	Callback = function(AutoRetryEnabled)
-    
-        AutoRetryOn = AutoRetryEnabled
-
-        while AutoRetryOn do
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
-            wait(1)
-        end
-        
-        Rayfield:Notify({
-        Title = "Retry",
-        Content = "Retry",
-        Duration = 1,
-        Image = "anchor",
-        })
-    end,
-})
-
-local Toggle = Tab:CreateToggle({
-	Name = "Auto Vote",
-	CurrentValue = false,
-	Flag = "AutoVote",
-	Callback = function(AutoVoteEnabled)
-        AutoVoteOn = AutoVoteEnabled
-        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
-    end,
-})
-
-local Toggle = Tab:CreateToggle({
-	Name = "Auto Click",
-	CurrentValue = false,
-	Flag = "AutoClick",
-	Callback = function(AutoClickEnabled)
-
-        AutoClickOn = AutoClickEnabled
-
-        local function simulateClick()
-        local mouseClick = Instance.new("BindableEvent")
-        mouseClick.Event:Connect(function()
-            print("Mouse clicked!")
-        end)
-        mouseClick:Fire()
-        end
-
-        while true do
-            SimulateClick()
-            wait(1)
-        end
-
-    end,
-})
+local Tab = Window:CreateTab("Main Lobby", "anchor")
+local Section = Tab:CreateSection("Main")
 
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Challenge",
