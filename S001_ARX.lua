@@ -1,6 +1,6 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-	Name = "S001 - AnimeRangersX",
+	Name = "S000 - AnimeRangersX",
 	Icon = 0,
 	LoadingTitle = "Loading...",
 	LoadingSubtitle = "by S001",
@@ -10,7 +10,7 @@ local Window = Rayfield:CreateWindow({
 	DisableBuildWarnings = false,
 
 	ConfigurationSaving = {
-	  Enabled = false,
+	  Enabled = true,
 	  FolderName = "AnimeRangersX",
 	  FileName = "AnimeRangersX_Save"
 	},
@@ -60,6 +60,8 @@ local AutoClickOn = false
 local AutoVoteOn = false
 local AutoNextOn = false
 
+local MenuFrameVisibility = LocalPlayer.PlayerGui.HUD:WaitForChild("MenuFrame").Visible
+
 -- Ranger Stage Variables
 local AutoJoinChallengeOn = false
 local AutoJoinRangerStage = false
@@ -90,7 +92,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoVote",
     Callback = function(AutoVoteEnabled)
         AutoVoteOn = AutoVoteEnabled
-        while AutoVoteOn do
+        while AutoVoteOn and not MenuFrameVisibility do
             wait(1)
             game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
         end
@@ -104,7 +106,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoNext",
     Callback = function(AutoNextEnabled)
         AutoNextOn = AutoNextEnabled
-        while AutoNextOn do
+        while AutoNextOn and not MenuFrameVisibility do
             wait(1)
             game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
         end
@@ -120,17 +122,10 @@ local Toggle = Tab:CreateToggle({
     
         AutoRetryOn = AutoRetryEnabled
 
-        while AutoRetryOn do
+        while AutoRetryOn and not MenuFrameVisibility do
             game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
             wait(1)
         end
-        
-        Rayfield:Notify({
-        Title = "Retry",
-        Content = "Retry",
-        Duration = 1,
-        Image = "anchor",
-        })
     end,
 })
 
@@ -141,7 +136,7 @@ local Toggle = Tab:CreateToggle({
     Callback = function(AutoJoinRangerStageEnabled)
         AutoJoinRangerStageOn = AutoJoinRangerStageEnabled
 
-        if AutoJoinRangerStageOn and LocalPlayer.PlayerGui.HUD.Enabled then
+        if AutoJoinRangerStageOn and MenuFrameVisibility then
             -- Open PlayRoom
             PlayRoom.Enabled = true
 
@@ -206,8 +201,15 @@ local Toggle = Tab:CreateToggle({
                     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
                 end
             end
+            Rayfield:Notify({
+            Title = "Ranger Stage on Cooldown",
+            Content = "Rangers in cooldown.",
+            Duration = 15,
+            Image = "anchor",
+            })
         end
-	end,
+        PlayRoom.Enabled = false
+	end, 
 })
 
 local Tab = Window:CreateTab("Main Lobby", "anchor")
@@ -218,7 +220,6 @@ local Toggle = Tab:CreateToggle({
     CurrentValue = false,
     Flag = "AutoJoinChallenge",
     Callback = function()
-
     end,
 })
 
