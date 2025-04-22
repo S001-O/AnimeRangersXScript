@@ -10,7 +10,7 @@ local Window = Rayfield:CreateWindow({
 	DisableBuildWarnings = false,
 
 	ConfigurationSaving = {
-	  Enabled = true,
+	  Enabled = false,
 	  FolderName = "AnimeRangersX",
 	  FileName = "AnimeRangersX_Save"
 	},
@@ -42,14 +42,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
+-- Player
 local player = Players.LocalPlayer
 local PlayerGui = player.PlayerGui
 local UserId = player.UserId
 local LocalPlayer = Players:GetPlayerByUserId(UserId)
 local LocalPlayerGui = LocalPlayer.PlayerGui
+local playerName = player.Character
 
 local PlayRoom = LocalPlayerGui.PlayRoom
 
+-- Toggles
 local GachaUIOn = false
 local JoinZCityOn = false
 local CollectQuestOn = false
@@ -59,8 +62,12 @@ local AutoRetryOn = false
 local AutoClickOn = false
 local AutoVoteOn = false
 local AutoNextOn = false
+local AutoJoinEasterEggEventOn = false
 
 local MenuFrameVisibility = LocalPlayer.PlayerGui.HUD:WaitForChild("MenuFrame").Visible
+
+-- Replicated Storage
+local Player_Data = ReplicatedStorage:WaitForChild("Player_Data"):GetChildren()
 
 -- Ranger Stage Variables
 local AutoJoinChallengeOn = false
@@ -81,50 +88,28 @@ local AllWorlds = {
 }
 --
 
--- Main
-local Tab = Window:CreateTab("Main Lobby", "anchor")
-local Section = Tab:CreateSection("Main")
+-- Maps
+local Tab = Window:CreateTab("Main", "anchor")
+local Section = Tab:CreateSection("Maps")
 
--- Auto Vote
 local Toggle = Tab:CreateToggle({
-    Name = "Auto Vote",
+    Name = "Auto Join Easter Egg Event",
     CurrentValue = false,
-    Flag = "AutoVote",
-    Callback = function(AutoVoteEnabled)
-        AutoVoteOn = AutoVoteEnabled
-        while AutoVoteOn and not MenuFrameVisibility do
-            wait(1)
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
-        end
-    end,
-})
-
--- Auto Next
-local Toggle = Tab:CreateToggle({
-    Name = "Auto Next",
-    CurrentValue = false,
-    Flag = "AutoNext",
-    Callback = function(AutoNextEnabled)
-        AutoNextOn = AutoNextEnabled
-        while AutoNextOn and not MenuFrameVisibility do
-            wait(1)
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
-        end
-    end,
-})
-
--- Auto Retry
-local Toggle = Tab:CreateToggle({
-	Name = "Auto Retry",
-	CurrentValue = false,
-	Flag = "AutoRetry",
-	Callback = function(AutoRetryEnabled)
-    
-        AutoRetryOn = AutoRetryEnabled
-
-        while AutoRetryOn and not MenuFrameVisibility do
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
-            wait(1)
+    Flag = "AutoJoinEasterEggEvent",
+    Callback = function(AutoJoinEasterEggEventEnabled)
+        AutoJoinEasterEggEventOn = AutoJoinEasterEggEventEnabled
+    while AutoJoinEasterEggEventOn and MenuFrameVisibility do
+        wait(1)
+        -- Auto Join Easter Event
+            local args = {
+            [1] = "Easter-Event"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+        -- Start
+            local args = {
+            [1] = "Start"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
         end
     end,
 })
@@ -212,47 +197,99 @@ local Toggle = Tab:CreateToggle({
 	end, 
 })
 
-local Tab = Window:CreateTab("Main Lobby", "anchor")
-local Section = Tab:CreateSection("Main")
+-- Auto
+local Section = Tab:CreateSection("Automation")
 
+-- Auto Vote
 local Toggle = Tab:CreateToggle({
-    Name = "Auto Join Challenge",
+    Name = "Auto Vote",
     CurrentValue = false,
-    Flag = "AutoJoinChallenge",
-    Callback = function()
+    Flag = "AutoVote",
+    Callback = function(AutoVoteEnabled)
+        AutoVoteOn = AutoVoteEnabled
+        while AutoVoteOn and not MenuFrameVisibility do
+            wait(1)
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
+        end
+    end,
+})
+
+-- Auto Next
+local Toggle = Tab:CreateToggle({
+    Name = "Auto Next",
+    CurrentValue = false,
+    Flag = "AutoNext",
+    Callback = function(AutoNextEnabled)
+        AutoNextOn = AutoNextEnabled
+        while AutoNextOn and not MenuFrameVisibility do
+            wait(1)
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
+        end
+    end,
+})
+
+-- Auto Retry
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Retry",
+	CurrentValue = false,
+	Flag = "AutoRetry",
+	Callback = function(AutoRetryEnabled)
+    
+        AutoRetryOn = AutoRetryEnabled
+
+        while AutoRetryOn and not MenuFrameVisibility do
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
+            wait(1)
+        end
     end,
 })
 
 -- Collect Quests
 local Toggle = Tab:CreateToggle({
-	Name = "Collect Quests",
+	Name = "Auto Collect Quests",
 	CurrentValue = false,
 	Flag = "CollectQuest",
 	Callback = function(CollectQuestEnabled)
-        CollectQuestOn = CollectQuestEnabled
-        while CollectQuestOn do
-            wait(1)
-        end
-    end,
+		CollectQuestOn = CollectQuestEnabled
+		
+		for i,player_Name in pairs(Player_Data) do
+			print("for_start")
+			print(player_Name)
+
+			if player_Name.Name == player.Name then
+
+				local DailyQuest = player_Name:WaitForChild("DailyQuest")
+				local WeeklyQuest = player_Name:WaitForChild("WeeklyQuest")
+
+				print(player_Name:GetChildren())
+				for _,player_QuestType in pairs(player_Name:GetChildren()) do
+					for _,quests_BoolValue in pairs(player_QuestType:GetDescendants()) do
+						if quests_BoolValue.Name == "claimed" and not quests_BoolValue.Value then
+							local args = {
+                            [1] = "ClaimAll",
+                            [2] = game:GetService("ReplicatedStorage"):WaitForChild("Player_Data"):WaitForChild("DemonHorus"):WaitForChild("DailyQuest"):WaitForChild("Ranger Mode II")
+                        }
+
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Gameplay"):WaitForChild("QuestEvent"):FireServer(unpack(args))
+                        wait(1)
+						end
+					end
+				end
+			else
+				break
+			end
+			print("for_end")
+			wait(1)
+		end
+		print("while_end")
+		wait(1)		
+	end,
 })
 
 -- UI
 local Tab = Window:CreateTab("Open UI", "anchor")
 local Section = Tab:CreateSection("UI")
 
-local Button = Tab:CreateButton({
-	Name = "Get ServerId",
-	Callback = function()
-        print("JobId "..JobId)
-        print("PlaceId "..PlaceId)
-    end,
-})
-
-local Button = Tab:CreateButton({
-	Name = "ChangeLevel",
-	Callback = function()
-    end,
-})
 -- Summon
 local Button = Tab:CreateButton({
 	Name = "Open Summon Banner",
@@ -342,23 +379,6 @@ local Button = Tab:CreateButton({
 })
 
 local Divider = Tab:CreateDivider()
-
--- Join/Rejoin
-local Tab = Window:CreateTab("Joining", "anchor")
-local Section = Tab:CreateSection("Rejoin")
-
-local Button = Tab:CreateButton({
-	Name = "Rejoin Server",
-	Callback = function()
-        if #Players:GetPlayers() <= 1 then
-            Players.LocalPlayer:Kick("\nRejoining...")
-            wait()
-            TeleportService:Teleport(PlaceId, Players.LocalPlayer)
-        else
-            TeleportService:TeleportToPlaceInstance(PlaceId, JobId, Players.LocalPlayer)
-        end
-    end,
-})
 
 -- Others
 local Tab = Window:CreateTab("Others", "anchor")
