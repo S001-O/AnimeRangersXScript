@@ -426,7 +426,7 @@ local function getUnitByTag(player_Name, UnitLoadout)
 end
 
 local function upgradeSlot(UnitLoadout)
-    print("getPlayer")
+    --print("getPlayer")
     for _, player_Name in pairs(Player_Data) do
         if player_Name.Name == player.Name then
             --print(player_Name.Name)
