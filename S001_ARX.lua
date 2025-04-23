@@ -66,11 +66,11 @@ local AutoJoinEasterEggEventOn = false
 local AutoRedeemCodesOn = false
 
 -- Upgrades
-local AutoUpgradeSlot1 = false
-local AutoUpgradeSlot2 = false
-local AutoUpgradeSlot3 = false
-local AutoUpgradeSlot4 = false
-local AutoUpgradeSlot5 = false
+local AutoUpgradeSlot1On = false
+local AutoUpgradeSlot2On = false
+local AutoUpgradeSlot3On = false
+local AutoUpgradeSlot4On = false
+local AutoUpgradeSlot5On = false
 
 -- Replicated Storage
 local Player_Data = ReplicatedStorage:WaitForChild("Player_Data"):GetChildren()
@@ -163,9 +163,6 @@ local Toggle = Tab:CreateToggle({
         end
     end,
 })
-
-
-
 
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Ranger Stage",
