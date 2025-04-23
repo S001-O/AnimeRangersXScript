@@ -10,7 +10,7 @@ local Window = Rayfield:CreateWindow({
 	DisableBuildWarnings = false,
 
 	ConfigurationSaving = {
-	  Enabled = false,
+	  Enabled = true,
 	  FolderName = "AnimeRangersX",
 	  FileName = "AnimeRangersX_Save"
 	},
@@ -63,11 +63,27 @@ local AutoClickOn = false
 local AutoVoteOn = false
 local AutoNextOn = false
 local AutoJoinEasterEggEventOn = false
+local AutoRedeemCodesOn = false
 
-local MenuFrameVisibility = LocalPlayer.PlayerGui.HUD:WaitForChild("MenuFrame").Visible
+-- Upgrades
+local AutoUpgradeSlot1 = false
+local AutoUpgradeSlot2 = false
+local AutoUpgradeSlot3 = false
+local AutoUpgradeSlot4 = false
+local AutoUpgradeSlot5 = false
 
 -- Replicated Storage
 local Player_Data = ReplicatedStorage:WaitForChild("Player_Data"):GetChildren()
+local Values = ReplicatedStorage:WaitForChild("Values")
+local Values_VotePlaying = Values:WaitForChild("Game"):WaitForChild("VotePlaying")
+local Values_VoteNext = Values:WaitForChild("Game"):WaitForChild("VoteNext")
+local Values_VoteRetry = Values:FindFirstChild("Game"):FindFirstChild("VoteRetry")
+local Values_Game = Values:WaitForChild("Game"):WaitForChild("GameRunning")
+local Values_Gamemode = Values:WaitForChild("Game"):WaitForChild("Gamemode")
+
+-- UI variables
+local RewardsUI = LocalPlayerGui:FindFirstChild("RewardsUI")
+local MenuFrameVisibility = LocalPlayer.PlayerGui.HUD:WaitForChild("MenuFrame").Visible
 
 -- Ranger Stage Variables
 local AutoJoinChallengeOn = false
@@ -92,13 +108,23 @@ local AllWorlds = {
 local Tab = Window:CreateTab("Main", "anchor")
 local Section = Tab:CreateSection("Maps")
 
+local function startMap()
+    local args = {
+        [1] = "Start"
+    }
+
+    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+end
+
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Easter Egg Event",
     CurrentValue = false,
     Flag = "AutoJoinEasterEggEvent",
     Callback = function(AutoJoinEasterEggEventEnabled)
+        local priority = 3
         AutoJoinEasterEggEventOn = AutoJoinEasterEggEventEnabled
-    while AutoJoinEasterEggEventOn and MenuFrameVisibility do
+        wait(priority)
+    while AutoJoinEasterEggEventOn and Values_Gamemode.Value == "" do
         wait(1)
         -- Auto Join Easter Event
             local args = {
@@ -115,17 +141,45 @@ local Toggle = Tab:CreateToggle({
 })
 
 local Toggle = Tab:CreateToggle({
+    Name = "Auto Join Challenge",
+    ChangeValue = false,
+    Flag = "AutoJoinChallenge",
+    Callback = function(AutoJoinChallengeEnabled)
+        local priority = 2
+        AutoJoinChallengeOn = AutoJoinChallengeEnabled
+        wait(priority)
+        while AutoJoinChallengeOn and Values_Gamemode.Value == "" do
+            wait(1)
+            local args = {
+                [1] = "Create",
+                [2] = {
+                    ["CreateChallengeRoom"] = true
+                }
+            }
+
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+
+            startMap()
+        end
+    end,
+})
+
+
+
+
+local Toggle = Tab:CreateToggle({
     Name = "Auto Join Ranger Stage",
     ChangeValue = false,
     Flag = "AutoJoinRangerStage",
     Callback = function(AutoJoinRangerStageEnabled)
         AutoJoinRangerStageOn = AutoJoinRangerStageEnabled
-
-        if AutoJoinRangerStageOn and MenuFrameVisibility then
+        local priority = 1
+        wait(priority)
+        if AutoJoinRangerStageOn and Values_Gamemode.Value == "" then
             -- Open PlayRoom
             PlayRoom.Enabled = true
-
             for world, rangerStage in pairs(AllWorlds) do
+                wait(0.5)
                 print(world)
                 -- Create PlayRoom
                 local args = {
@@ -207,10 +261,16 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoVote",
     Callback = function(AutoVoteEnabled)
         AutoVoteOn = AutoVoteEnabled
-        while AutoVoteOn and not MenuFrameVisibility do
+        while AutoVoteOn do
+            if not Values_VotePlaying.VoteEnded.Value then
+            --print("autovoteon")
+                if Values_VotePlaying.VoteEnabled.Value then
+                    wait(1)
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
+                end
+            end
             wait(1)
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
-        end
+		end
     end,
 })
 
@@ -221,12 +281,31 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoNext",
     Callback = function(AutoNextEnabled)
         AutoNextOn = AutoNextEnabled
-        while AutoNextOn and not MenuFrameVisibility do
+        while AutoNextOn do
+			if Values_VoteNext.VoteEnabled.Value then
+				print("AutoNextOn")
+				wait(1)
+				game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
+			end
             wait(1)
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
-        end
+		end
     end,
 })
+
+local function toggleRewardsUI()
+    wait(1)
+    if RewardsUI.Enabled then
+        RewardsUI.Enabled = false
+    end
+    wait(1)
+    RewardsUI.Enabled = true
+    wait(2)
+    RewardsUI.Enabled = false
+end
+
+local function fireVoteRetryEvent()
+    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
+end
 
 -- Auto Retry
 local Toggle = Tab:CreateToggle({
@@ -237,14 +316,22 @@ local Toggle = Tab:CreateToggle({
     
         AutoRetryOn = AutoRetryEnabled
 
-        while AutoRetryOn and not MenuFrameVisibility do
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
+        while AutoRetryOn do
             wait(1)
+            --print("AutoRetryOn")
+            if Values_VoteRetry.VoteEnabled.Value then
+                wait(1)
+                toggleRewardsUI()
+                wait(1.3)
+                fireVoteRetryEvent()
+            end
         end
     end,
 })
 
--- Collect Quests
+local Divider = Tab:CreateDivider()
+
+--  Auto Collect Quests
 local Toggle = Tab:CreateToggle({
 	Name = "Auto Collect Quests",
 	CurrentValue = false,
@@ -252,38 +339,238 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(CollectQuestEnabled)
 		CollectQuestOn = CollectQuestEnabled
 		
-		for i,player_Name in pairs(Player_Data) do
-			print("for_start")
-			print(player_Name)
+        while CollectQuestOn and Values_Gamemode.Value == "" do
+            for i,player_Name in pairs(Player_Data) do
+                print("for_start")
+                print(player_Name)
 
-			if player_Name.Name == player.Name then
+                if player_Name.Name == player.Name then
 
-				local DailyQuest = player_Name:WaitForChild("DailyQuest")
-				local WeeklyQuest = player_Name:WaitForChild("WeeklyQuest")
+                    local DailyQuest = player_Name:WaitForChild("DailyQuest")
+                    local WeeklyQuest = player_Name:WaitForChild("WeeklyQuest")
 
-				print(player_Name:GetChildren())
-				for _,player_QuestType in pairs(player_Name:GetChildren()) do
-					for _,quests_BoolValue in pairs(player_QuestType:GetDescendants()) do
-						if quests_BoolValue.Name == "claimed" and not quests_BoolValue.Value then
-							local args = {
-                            [1] = "ClaimAll",
-                            [2] = game:GetService("ReplicatedStorage"):WaitForChild("Player_Data"):WaitForChild("DemonHorus"):WaitForChild("DailyQuest"):WaitForChild("Ranger Mode II")
-                        }
+                    print(player_Name:GetChildren())
+                    for _,player_QuestType in pairs(player_Name:GetChildren()) do
+                        for _,quests_BoolValue in pairs(player_QuestType:GetDescendants()) do
+                            if quests_BoolValue.Name == "claimed" and not quests_BoolValue.Value then
+                                local args = {
+                                [1] = "ClaimAll",
+                                [2] = game:GetService("ReplicatedStorage"):WaitForChild("Player_Data"):WaitForChild("DemonHorus"):WaitForChild("DailyQuest"):WaitForChild("Ranger Mode II")
+                            }
 
-                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Gameplay"):WaitForChild("QuestEvent"):FireServer(unpack(args))
-                        wait(1)
-						end
-					end
-				end
-			else
-				break
-			end
-			print("for_end")
-			wait(1)
-		end
-		print("while_end")
-		wait(1)		
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Gameplay"):WaitForChild("QuestEvent"):FireServer(unpack(args))
+                            wait(1)
+                            end
+                        end
+                    end
+                else
+                    break
+                end
+                print("for_end")
+                wait(1)
+            end
+            print("while_end")
+            wait(1)
+        end
 	end,
+})
+
+local Tab = Window:CreateTab("Upgrades", "anchor")
+local Section = Tab:CreateSection("Upgrade")
+
+-- Auto Upgrade Slot 1 ------------------------------------------------------------------------------------------------------------------------------------
+local function upgradeSlotOneTest(unit)
+    --print(unit)
+    local args = {
+        [1] = player.UnitsFolder:WaitForChild(unit)
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Units"):WaitForChild("Upgrade"):FireServer(unpack(args))
+end
+
+local function getUnitLoadout1(player_Name, UnitLoadout)
+    --print("getUnitLoadout1")
+    --print(UnitLoadout)
+    local Data = player_Name:FindFirstChild("Data")
+    local UnitLoadoutTable = {
+        ["UnitLoadout1"] = Data.UnitLoadout1.Value,
+        ["UnitLoadout2"] = Data.UnitLoadout2.Value,
+        ["UnitLoadout3"] = Data.UnitLoadout3.Value,
+        ["UnitLoadout4"] = Data.UnitLoadout4.Value,
+        ["UnitLoadout5"] = Data.UnitLoadout5.Value,
+        ["UnitLoadout6"] = Data.UnitLoadout6.Value,
+    }
+    for UnitLoadoutNumber, UnitLoadoutValue in pairs(UnitLoadoutTable) do
+        --print(UnitLoadoutNumber, UnitLoadoutValue)
+        if UnitLoadout == UnitLoadoutNumber then
+            return UnitLoadoutValue
+        end
+    end
+end
+
+local function getUnitLoadout2(player_Name)
+    --print("getUnitLoadout1")
+    local Data = player_Name:FindFirstChild("Data")
+    local UnitLoadout2 = Data.UnitLoadout2.Value
+    return UnitLoadout2
+end
+
+local function getUnitByTag(player_Name, UnitLoadout)
+    --print("getUnitByTag")
+    local Collection = player_Name:FindFirstChild("Collection"):GetDescendants()
+    for _, unit_name in pairs (Collection) do
+        if unit_name.Name == "Tag" and unit_name.Value == getUnitLoadout1(player_Name, UnitLoadout) then
+            local Unit = unit_name.Parent.Name
+            upgradeSlotOneTest(Unit)
+        end
+    end
+end
+
+local function upgradeSlot(UnitLoadout)
+    print("getPlayer")
+    for _, player_Name in pairs(Player_Data) do
+        if player_Name.Name == player.Name then
+            --print(player_Name.Name)
+            getUnitByTag(player_Name, UnitLoadout)
+        else
+            break
+        end
+        wait(1)
+    end
+end
+
+local function upgradeSlotOne()
+    --print("running")
+    for _,player_name in ipairs(Player_Data) do
+        if player_name.Name == player.Name then
+            --print(player_name)
+            local Data = player_name:FindFirstChild("Data")
+            local Tag = Data.UnitLoadout1.Value
+            local Collection = player_name:FindFirstChild("Collection")
+
+            for _, unit_name in ipairs(Collection:GetDescendants()) do
+                if unit_name.Name == "Tag" and unit_name.Value == Tag then
+                    --print('"' .. unit_name.Parent.Name .. '"')
+                    local Unit = unit_name.Parent.Name
+                    wait(0.5)
+                    --print("Upgraded")
+                    local args = {
+                        [1] = player.UnitsFolder:WaitForChild(Unit)
+                    }
+
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Units"):WaitForChild("Upgrade"):FireServer(unpack(args))
+                end
+            end
+        end
+    end
+end
+
+-- Auto Upgrade Slot 1
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Upgrade Slot 1",
+	CurrentValue = false,
+	Flag = "AutoUpgradeSlot1",
+	Callback = function(AutoUpgradeSlot1Enabled)
+        AutoUpgradeSlot1On = AutoUpgradeSlot1Enabled
+
+        while AutoUpgradeSlot1On do
+			wait(0.5)
+            if Values_Game.Value then
+            local UnitLoadout = "UnitLoadout1"
+            upgradeSlot(UnitLoadout)
+            end
+		end
+
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Upgrade Slot 2",
+	CurrentValue = false,
+	Flag = "AutoUpgradeSlot2",
+	Callback = function(AutoUpgradeSlot2Enabled)
+        AutoUpgradeSlot2On = AutoUpgradeSlot2Enabled
+
+        while AutoUpgradeSlot2On do
+			wait(0.5)
+            if Values_Game.Value then
+            local UnitLoadout = "UnitLoadout2"
+            upgradeSlot(UnitLoadout)
+            end
+		end
+
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Upgrade Slot 3",
+	CurrentValue = false,
+	Flag = "AutoUpgradeSlot3",
+	Callback = function(AutoUpgradeSlot3Enabled)
+        AutoUpgradeSlot3On = AutoUpgradeSlot3Enabled
+
+        while AutoUpgradeSlot2On do
+			wait(0.5)
+            if Values_Game.Value then
+            local UnitLoadout = "UnitLoadout3"
+            upgradeSlot(UnitLoadout)
+            end
+		end
+
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Upgrade Slot 4",
+	CurrentValue = false,
+	Flag = "AutoUpgradeSlot4",
+	Callback = function(AutoUpgradeSlot4Enabled)
+        AutoUpgradeSlot4On = AutoUpgradeSlot4Enabled
+
+        while AutoUpgradeSlot4On do
+			wait(0.5)
+            if Values_Game.Value then
+            local UnitLoadout = "UnitLoadout4"
+            upgradeSlot(UnitLoadout)
+            end
+		end
+
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Upgrade Slot 5",
+	CurrentValue = false,
+	Flag = "AutoUpgradeSlot5",
+	Callback = function(AutoUpgradeSlot5Enabled)
+        AutoUpgradeSlot5On = AutoUpgradeSlot5Enabled
+
+        while AutoUpgradeSlot5On do
+			wait(0.5)
+            if Values_Game.Value then
+            local UnitLoadout = "UnitLoadout5"
+            upgradeSlot(UnitLoadout)
+            end
+		end
+
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Upgrade Slot 6",
+	CurrentValue = false,
+	Flag = "AutoUpgradeSlot6",
+	Callback = function(AutoUpgradeSlot6Enabled)
+        AutoUpgradeSlot6On = AutoUpgradeSlot6Enabled
+
+        while AutoUpgradeSlot6On do
+			wait(0.5)
+            if Values_Game.Value then
+            local UnitLoadout = "UnitLoadout6"
+            upgradeSlot(UnitLoadout)
+            end
+		end
+
+    end,
 })
 
 -- UI
@@ -315,6 +602,15 @@ local Button = Tab:CreateButton({
     end,
 })
 
+local Divider = Tab:CreateDivider()
+-- Open Redeem Codes
+local Button = Tab:CreateButton({
+	Name = "Open Redeem Codes",
+	Callback = function()
+        local LocalPlayer = Players:GetPlayerByUserId(UserId)
+        LocalPlayer.PlayerGui.Code.Enabled = true
+    end,
+})
 -- Level Rewards
 local Button = Tab:CreateButton({
 	Name = "Open Level Rewards",
