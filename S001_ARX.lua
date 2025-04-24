@@ -314,10 +314,6 @@ local Toggle = Tab:CreateToggle({
 
 local function toggleRewardsUI()
     wait(1)
-    if RewardsUI.Enabled then
-        RewardsUI.Enabled = false
-    end
-    wait(1)
     RewardsUI.Enabled = true
     wait(2)
     RewardsUI.Enabled = false
@@ -344,6 +340,10 @@ local Toggle = Tab:CreateToggle({
                 toggleRewardsUI()
                 wait(1.3)
                 fireVoteRetryEvent()
+            end
+            wait(1)
+            if RewardsUI.Enabled then
+                RewardsUI.Enabled = false
             end
         end
     end,
