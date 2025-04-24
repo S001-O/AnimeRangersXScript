@@ -116,50 +116,80 @@ local function startMap()
     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
 end
 
+local function joinEasterEvent()
+		local args = {
+		[1] = "Easter-Event"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+	-- Start
+	startMap()
+end
+
+local function joinChallenge()
+	local args = {
+		[1] = "Create",
+		[2] = {
+			["CreateChallengeRoom"] = true
+		}
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+	-- Start
+	startMap()
+end
+
+local VirtualUser = cloneref(game:GetService("VirtualUser"))
+
+local function antiAfk()
+    player.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
+end
+
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Easter Egg Event",
     CurrentValue = false,
     Flag = "AutoJoinEasterEggEvent",
     Callback = function(AutoJoinEasterEggEventEnabled)
-        local priority = 3
+	
         AutoJoinEasterEggEventOn = AutoJoinEasterEggEventEnabled
-        wait(priority)
-    while AutoJoinEasterEggEventOn and Values_Gamemode.Value == "" do
-        wait(1)
-        -- Auto Join Easter Event
-            local args = {
-            [1] = "Easter-Event"
-        }
-        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-        -- Start
-            local args = {
-            [1] = "Start"
-        }
-        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+		
+		while AutoJoinEasterEggEventOn and Values_Gamemode.Value == "" do
+            if AutoJoinChallengeOn and AutoJoinRangerStageOn then
+                wait(25)
+                joinEasterEvent()
+            elseif AutoJoinChallengeOn and not AutoJoinRangerStageOn then
+                wait(10)
+                joinEasterEvent()
+            elseif AutoJoinRangerStageOn and not AutoJoinChallengeOn then
+                wait(15)
+                joinEasterEvent()
+            else
+                wait(1)
+                joinEasterEvent()
+            end
+			wait(1)
         end
     end,
 })
-
+-- Auto Join Challenge
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Challenge",
     ChangeValue = false,
     Flag = "AutoJoinChallenge",
     Callback = function(AutoJoinChallengeEnabled)
-        local priority = 2
+	
         AutoJoinChallengeOn = AutoJoinChallengeEnabled
-        wait(priority)
+		
         while AutoJoinChallengeOn and Values_Gamemode.Value == "" do
+            if AutoJoinRangerStageOn then
+                wait(10)
+                joinChallenge()
+		    else
+                wait(1)
+                joinChallenge()
+            end
             wait(1)
-            local args = {
-                [1] = "Create",
-                [2] = {
-                    ["CreateChallengeRoom"] = true
-                }
-            }
-
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-
-            startMap()
         end
     end,
 })
@@ -169,82 +199,77 @@ local Toggle = Tab:CreateToggle({
     ChangeValue = false,
     Flag = "AutoJoinRangerStage",
     Callback = function(AutoJoinRangerStageEnabled)
+    
         AutoJoinRangerStageOn = AutoJoinRangerStageEnabled
-        local priority = 1
-        wait(priority)
-        if AutoJoinRangerStageOn and Values_Gamemode.Value == "" then
-            -- Open PlayRoom
-            PlayRoom.Enabled = true
-            for world, rangerStage in pairs(AllWorlds) do
-                wait(0.5)
-                print(world)
-                -- Create PlayRoom
-                local args = {
-                    [1] = "Create"
-                }
-
-                game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                -- Change Mode
-                local args = {
-                    [1] = "Change-Mode",
-                    [2] = {
-                        ["Mode"] = "Ranger Stage"
-                    }
-                }
-
-                game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-
-                -- ChangeWorld
+        if AutoJoinEasterEggEvent or AutoJoinChallengeOn then
+            wait(1)
+            if AutoJoinRangerStageOn and Values_Gamemode.Value == "" then
+                -- Open PlayRoom
+                PlayRoom.Enabled = true
+                for world, rangerStage in pairs(AllWorlds) do
+                    wait(0.5)
+                    -- Create PlayRoom
                     local args = {
-                        [1] = "Change-World",
+                        [1] = "Create"
+                    }
+
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+                    -- Change Mode
+                    local args = {
+                        [1] = "Change-Mode",
                         [2] = {
-                            ["World"] = world
+                            ["Mode"] = "Ranger Stage"
                         }
                     }
-                    
+
                     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                    -- Change Chapter
-                    for rangerStage_pos,rangerStage_value in ipairs(rangerStage) do
-                        wait(0.5)
+
+                    -- ChangeWorld
                         local args = {
-                            [1] = "Change-Chapter",
+                            [1] = "Change-World",
                             [2] = {
-                                ["Chapter"] = rangerStage_value
+                                ["World"] = world
                             }
                         }
                         
                         game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                
-                    -- Change FriendOnly
-                    local args = {
-                        [1] = "Change-FriendOnly"
-                    }
-
-                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-
-                    local args = {
-                        [1] = "Submit"
-                    }
-
-                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+                        -- Change Chapter
+                        for rangerStage_pos,rangerStage_value in ipairs(rangerStage) do
+                            wait(0.5)
+                            local args = {
+                                [1] = "Change-Chapter",
+                                [2] = {
+                                    ["Chapter"] = rangerStage_value
+                                }
+                            }
+                            
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
                     
-                    
-                    -- Start
-                    local args = {
-                    [1] = "Start"
-                    }
+                        -- Change FriendOnly
+                            local args = {
+                                [1] = "Change-FriendOnly"
+                            }
 
-                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                end
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+
+                            local args = {
+                                [1] = "Submit"
+                            }
+
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+                            -- Start
+                            startMap()
+                        end
+                    end
+                Rayfield:Notify({
+                Title = "Ranger Stage on Cooldown",
+                Content = "Rangers in cooldown.",
+                Duration = 15,
+                Image = "anchor",
+                })
             end
-            Rayfield:Notify({
-            Title = "Ranger Stage on Cooldown",
-            Content = "Rangers in cooldown.",
-            Duration = 15,
-            Image = "anchor",
-            })
+            PlayRoom.Enabled = false
         end
-        PlayRoom.Enabled = false
 	end, 
 })
 
@@ -260,7 +285,6 @@ local Toggle = Tab:CreateToggle({
         AutoVoteOn = AutoVoteEnabled
         while AutoVoteOn do
             if not Values_VotePlaying.VoteEnded.Value then
-            --print("autovoteon")
                 if Values_VotePlaying.VoteEnabled.Value then
                     wait(1)
                     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
@@ -280,7 +304,6 @@ local Toggle = Tab:CreateToggle({
         AutoNextOn = AutoNextEnabled
         while AutoNextOn do
 			if Values_VoteNext.VoteEnabled.Value then
-				print("AutoNextOn")
 				wait(1)
 				game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
 			end
@@ -314,8 +337,8 @@ local Toggle = Tab:CreateToggle({
         AutoRetryOn = AutoRetryEnabled
 
         while AutoRetryOn do
+            antiAfk()
             wait(1)
-            --print("AutoRetryOn")
             if Values_VoteRetry.VoteEnabled.Value then
                 wait(1)
                 toggleRewardsUI()
@@ -338,15 +361,9 @@ local Toggle = Tab:CreateToggle({
 		
         while CollectQuestOn and Values_Gamemode.Value == "" do
             for i,player_Name in pairs(Player_Data) do
-                print("for_start")
-                print(player_Name)
-
                 if player_Name.Name == player.Name then
-
                     local DailyQuest = player_Name:WaitForChild("DailyQuest")
                     local WeeklyQuest = player_Name:WaitForChild("WeeklyQuest")
-
-                    print(player_Name:GetChildren())
                     for _,player_QuestType in pairs(player_Name:GetChildren()) do
                         for _,quests_BoolValue in pairs(player_QuestType:GetDescendants()) do
                             if quests_BoolValue.Name == "claimed" and not quests_BoolValue.Value then
@@ -354,7 +371,6 @@ local Toggle = Tab:CreateToggle({
                                 [1] = "ClaimAll",
                                 [2] = game:GetService("ReplicatedStorage"):WaitForChild("Player_Data"):WaitForChild("DemonHorus"):WaitForChild("DailyQuest"):WaitForChild("Ranger Mode II")
                             }
-
                             game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Gameplay"):WaitForChild("QuestEvent"):FireServer(unpack(args))
                             wait(1)
                             end
@@ -363,10 +379,8 @@ local Toggle = Tab:CreateToggle({
                 else
                     break
                 end
-                print("for_end")
                 wait(1)
             end
-            print("while_end")
             wait(1)
         end
 	end,
@@ -376,8 +390,7 @@ local Tab = Window:CreateTab("Upgrades", "anchor")
 local Section = Tab:CreateSection("Upgrade")
 
 -- Auto Upgrade Slot 1 ------------------------------------------------------------------------------------------------------------------------------------
-local function upgradeSlotOneTest(unit)
-    --print(unit)
+local function upgradeSlotNumber(unit)
     local args = {
         [1] = player.UnitsFolder:WaitForChild(unit)
     }
@@ -385,8 +398,6 @@ local function upgradeSlotOneTest(unit)
 end
 
 local function getUnitLoadout1(player_Name, UnitLoadout)
-    --print("getUnitLoadout1")
-    --print(UnitLoadout)
     local Data = player_Name:FindFirstChild("Data")
     local UnitLoadoutTable = {
         ["UnitLoadout1"] = Data.UnitLoadout1.Value,
@@ -397,67 +408,30 @@ local function getUnitLoadout1(player_Name, UnitLoadout)
         ["UnitLoadout6"] = Data.UnitLoadout6.Value,
     }
     for UnitLoadoutNumber, UnitLoadoutValue in pairs(UnitLoadoutTable) do
-        --print(UnitLoadoutNumber, UnitLoadoutValue)
         if UnitLoadout == UnitLoadoutNumber then
             return UnitLoadoutValue
         end
     end
 end
 
-local function getUnitLoadout2(player_Name)
-    --print("getUnitLoadout1")
-    local Data = player_Name:FindFirstChild("Data")
-    local UnitLoadout2 = Data.UnitLoadout2.Value
-    return UnitLoadout2
-end
-
 local function getUnitByTag(player_Name, UnitLoadout)
-    --print("getUnitByTag")
     local Collection = player_Name:FindFirstChild("Collection"):GetDescendants()
     for _, unit_name in pairs (Collection) do
         if unit_name.Name == "Tag" and unit_name.Value == getUnitLoadout1(player_Name, UnitLoadout) then
             local Unit = unit_name.Parent.Name
-            upgradeSlotOneTest(Unit)
+            upgradeSlotNumber(Unit)
         end
     end
 end
 
 local function upgradeSlot(UnitLoadout)
-    --print("getPlayer")
     for _, player_Name in pairs(Player_Data) do
         if player_Name.Name == player.Name then
-            --print(player_Name.Name)
             getUnitByTag(player_Name, UnitLoadout)
         else
             break
         end
         wait(1)
-    end
-end
-
-local function upgradeSlotOne()
-    --print("running")
-    for _,player_name in ipairs(Player_Data) do
-        if player_name.Name == player.Name then
-            --print(player_name)
-            local Data = player_name:FindFirstChild("Data")
-            local Tag = Data.UnitLoadout1.Value
-            local Collection = player_name:FindFirstChild("Collection")
-
-            for _, unit_name in ipairs(Collection:GetDescendants()) do
-                if unit_name.Name == "Tag" and unit_name.Value == Tag then
-                    --print('"' .. unit_name.Parent.Name .. '"')
-                    local Unit = unit_name.Parent.Name
-                    wait(0.5)
-                    --print("Upgraded")
-                    local args = {
-                        [1] = player.UnitsFolder:WaitForChild(Unit)
-                    }
-
-                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Units"):WaitForChild("Upgrade"):FireServer(unpack(args))
-                end
-            end
-        end
     end
 end
 
@@ -505,7 +479,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot3Enabled)
         AutoUpgradeSlot3On = AutoUpgradeSlot3Enabled
 
-        while AutoUpgradeSlot2On do
+        while AutoUpgradeSlot3On do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout3"
