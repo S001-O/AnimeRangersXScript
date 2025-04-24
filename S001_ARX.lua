@@ -323,6 +323,11 @@ local function fireVoteRetryEvent()
     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
 end
 
+local function removeGameEndedAnimationUI()
+    local GameEndedAnimationUI = player.PlayerGui:GetChilden("GameEndedAnimationUI")
+    GameEndedAnimationUI:Destroy()
+end
+
 -- Auto Retry
 local Toggle = Tab:CreateToggle({
 	Name = "Auto Retry",
@@ -334,6 +339,7 @@ local Toggle = Tab:CreateToggle({
 
         while AutoRetryOn do
             antiAfk()
+            removeGameEndedAnimationUI()
             wait(1)
             if Values_VoteRetry.VoteEnabled.Value then
                 wait(1)
