@@ -428,10 +428,8 @@ local function upgradeSlot(UnitLoadout)
     for _, player_Name in pairs(Player_Data) do
         if player_Name.Name == player.Name then
             getUnitByTag(player_Name, UnitLoadout)
-        else
-            break
         end
-        wait(1)
+        wait(0.5)
     end
 end
 
