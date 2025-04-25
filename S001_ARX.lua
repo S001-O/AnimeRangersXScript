@@ -361,8 +361,10 @@ local Toggle = Tab:CreateToggle({
 			if RewardsUI.Enabled then
 				RewardsUI.Enabled = false
 			end
-			local SavedToTeleport = player:WaitForChild("SavedToTeleport")
-			SavedToTeleport:Destroy()
+            local SavedToTeleport = player:WaitForChild("SavedToTeleport")
+            if SavedToTeleport then
+                SavedToTeleport:Destroy()
+            end
 			wait(1)
         end
     end,
