@@ -139,13 +139,6 @@ end
 
 local VirtualUser = cloneref(game:GetService("VirtualUser"))
 
-local function antiAfk()
-    player.Idled:Connect(function()
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new())
-    end)
-end
-
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Easter Egg Event",
     CurrentValue = false,
@@ -186,7 +179,7 @@ local Toggle = Tab:CreateToggle({
                 wait(10)
                 joinChallenge()
 		    else
-                wait(1)
+                wait(3)
                 joinChallenge()
             end
             wait(1)
@@ -323,6 +316,20 @@ local function fireVoteRetryEvent()
     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
 end
 
+local function antiAfk()
+    player.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
+end
+
+local function voteRetry()
+	toggleRewardsUI()
+	fireVoteRetryEvent()
+	if RewardsUI.Enabled then
+		RewardsUI.Enabled = false
+	end
+end
 -- Auto Retry
 local Toggle = Tab:CreateToggle({
 	Name = "Auto Retry",
@@ -333,18 +340,26 @@ local Toggle = Tab:CreateToggle({
         AutoRetryOn = AutoRetryEnabled
 
         while AutoRetryOn do
-            antiAfk()
-            wait(1)
-            if Values_VoteRetry.VoteEnabled.Value then
-				wait(1)
-				toggleRewardsUI()
-                wait(1.3)
-				fireVoteRetryEvent()
-            end
-            wait(1)
-            if RewardsUI.Enabled then
-                RewardsUI.Enabled = false
-            end
+			local dt = DateTime.now()
+			local localTime = dt:ToLocalTime()
+			local currentHour = localTime.Hour
+			local currentMinute = localTime.Minute
+			local currentSecond = localTime.Second
+			antiAfk()
+			print(currentSecond)
+			if Values_VoteRetry.VoteEnabled.Value then
+				if (currentMinute == 59 and currentSecond >= 50) then
+					wait(15)
+					voteRetry()
+				elseif (currentMinute == 00 and currentSecond <= 05) then
+					wait(5)
+					voteRetry()
+				else
+					wait(1)
+					voteRetry()
+				end
+			end
+			wait(1)
         end
     end,
 })
