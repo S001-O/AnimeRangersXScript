@@ -346,7 +346,6 @@ local Toggle = Tab:CreateToggle({
 			local currentMinute = localTime.Minute
 			local currentSecond = localTime.Second
 			antiAfk()
-			print(currentSecond)
 			if Values_VoteRetry.VoteEnabled.Value and not LoadingDataUI.Enabled then
 				if (currentMinute == 59 and currentSecond >= 50) then
 					wait(15)
@@ -359,6 +358,11 @@ local Toggle = Tab:CreateToggle({
 					voteRetry()
 				end
 			end
+			if RewardsUI.Enabled then
+				RewardsUI.Enabled = false
+			end
+			local SavedToTeleport = player:WaitForChild("SavedToTeleport")
+			SavedToTeleport:Destroy()
 			wait(1)
         end
     end,
