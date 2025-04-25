@@ -84,7 +84,7 @@ local Values_Gamemode = Values:WaitForChild("Game"):WaitForChild("Gamemode")
 -- UI variables
 local RewardsUI = LocalPlayerGui:FindFirstChild("RewardsUI")
 local MenuFrameVisibility = LocalPlayer.PlayerGui.HUD:WaitForChild("MenuFrame").Visible
-
+local LoadingDataUI = LocalPlayerGui:FindFirstChild("LoadingDataUI")
 -- Ranger Stage Variables
 local AutoJoinChallengeOn = false
 local AutoJoinRangerStage = false
@@ -347,7 +347,7 @@ local Toggle = Tab:CreateToggle({
 			local currentSecond = localTime.Second
 			antiAfk()
 			print(currentSecond)
-			if Values_VoteRetry.VoteEnabled.Value then
+			if Values_VoteRetry.VoteEnabled.Value and not LoadingDataUI.Enabled then
 				if (currentMinute == 59 and currentSecond >= 50) then
 					wait(15)
 					voteRetry()
