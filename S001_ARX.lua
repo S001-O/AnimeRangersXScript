@@ -401,9 +401,9 @@ local Divider = Tab:CreateDivider()
 local function claimAllQuests(player_Name, quests_BoolValue_Name)
     local args = {
         [1] = "ClaimAll",
-        [2] = game:GetService("ReplicatedStorage"):WaitForChild("Player_Data"):WaitForChild(player_Name):WaitForChild("DailyQuest"):WaitForChild(quests_BoolValue_Name)
+        [2] = game:GetService("ReplicatedStorage"):FindFirstChild("Player_Data"):FindFirstChild(player_Name):FindFirstChild("DailyQuest"):FindFirstChild(quests_BoolValue_Name)
     }
-    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("Gameplay"):WaitForChild("QuestEvent"):FireServer(unpack(args))
+    game:GetService("ReplicatedStorage"):FindFirstChild("Remote"):FindFirstChild("Server"):FindFirstChild("Gameplay"):FindFirstChild("QuestEvent"):FireServer(unpack(args))
 end
 
 --  Auto Collect Quests
@@ -420,7 +420,7 @@ local Toggle = Tab:CreateToggle({
                     for _,player_QuestType in pairs(player_Name:GetChildren()) do
                         for _,quests_BoolValue in pairs(player_QuestType:GetDescendants()) do
                             if quests_BoolValue.Name == "claimed" and not quests_BoolValue.Value then
-                                claimAllQuests(player.Name, quests_BoolValue.Name)
+								claimAllQuests(player.Name, quests_BoolValue.Parent.Name)
                             end
                         end
                     end
