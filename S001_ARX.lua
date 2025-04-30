@@ -331,6 +331,7 @@ local Toggle = Tab:CreateToggle({
 local function toggleRewardsUI()
 	if Values_VoteRetry.VoteEnabled.Value and not LoadingDataUI.Enabled then
 		RewardsUI.Enabled = true
+        wait(1)
 		RewardsUI.Enabled = false	
 	end
 	if RewardsUI.Enabled then
