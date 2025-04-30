@@ -167,8 +167,8 @@ local Toggle = Tab:CreateToggle({
                     wait(1)
                     joinEasterEvent()
                 end
-                wait(1)
             end
+			wait()
         end
         -- EasterEvent, Challenge, RangerStage
             -- priority = RangerStage, Challenge, EasterEvent, BossEvent, Story
@@ -195,83 +195,11 @@ local Toggle = Tab:CreateToggle({
                     wait(3)
                     joinChallenge()
                 end
-                wait(1)
             end
+			wait()
         end
     end,
 })
-
-local function RangerStage()
-    if AutoJoinEasterEggEvent or AutoJoinChallengeOn then
-        wait(1)
-        if AutoJoinRangerStageOn and Values_Gamemode.Value == "" then
-            -- Open PlayRoom
-            PlayRoom.Enabled = true
-            for world, rangerStage in pairs(AllWorlds) do
-                wait(0.5)
-                -- Create PlayRoom
-                local args = {
-                    [1] = "Create"
-                }
-
-                game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                -- Change Mode
-                local args = {
-                    [1] = "Change-Mode",
-                    [2] = {
-                        ["Mode"] = "Ranger Stage"
-                    }
-                }
-
-                game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-
-                -- ChangeWorld
-                    local args = {
-                        [1] = "Change-World",
-                        [2] = {
-                            ["World"] = world
-                        }
-                    }
-                    
-                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                    -- Change Chapter
-                    for rangerStage_pos,rangerStage_value in ipairs(rangerStage) do
-                        wait(0.5)
-                        local args = {
-                            [1] = "Change-Chapter",
-                            [2] = {
-                                ["Chapter"] = rangerStage_value
-                            }
-                        }
-                        
-                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                
-                    -- Change FriendOnly
-                        local args = {
-                            [1] = "Change-FriendOnly"
-                        }
-
-                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-
-                        local args = {
-                            [1] = "Submit"
-                        }
-
-                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
-                        -- Start
-                        startMap()
-                    end
-                end
-            Rayfield:Notify({
-            Title = "Ranger Stage on Cooldown",
-            Content = "Rangers in cooldown.",
-            Duration = 15,
-            Image = "anchor",
-            })
-        end
-        PlayRoom.Enabled = false
-    end
-end
 
 local function createLobby()
     local args = {
@@ -332,19 +260,24 @@ local Toggle = Tab:CreateToggle({
     
         AutoJoinRangerStageOn = AutoJoinRangerStageEnabled
         
-        for world, rangerStage in pairs(AllWorlds) do
-            wait(0.5)
-            createLobby()
-            changeMode()
-            changeWorld(world)
-            for rangerStage_pos,rangerStage_value in ipairs(rangerStage) do
-                wait(0.5)
-                changeStage(rangerStage_value)
-                changeFriendsOnly()
-                submitChanges()
-                startMap()
-            end
-        end
+		while AutoJoinRangerStageOn do
+			if Values_Gamemode.Value == "" then
+				for world, rangerStage in pairs(AllWorlds) do
+					wait(0.5)
+					createLobby()
+					changeMode()
+					changeWorld(world)
+					for rangerStage_pos,rangerStage_value in ipairs(rangerStage) do
+						wait(0.5)
+						changeStage(rangerStage_value)
+						changeFriendsOnly()
+						submitChanges()
+						startMap()
+					end
+				end
+			end
+			wait()
+		end
 	end,
 })
 
@@ -398,10 +331,10 @@ local Toggle = Tab:CreateToggle({
 local function toggleRewardsUI()
     if Values_VoteRetry.VoteEnabled.Value and not LoadingDataUI.Enabled then
         RewardsUI.Enabled = true
-        RewardsUI.Enabled = false
+		RewardsUI.Enabled = false
 	else
 		if RewardsUI.Enabled then
-		RewardsUI.Enabled = false
+			RewardsUI.Enabled = false	
 		end
 	end
 end
@@ -457,7 +390,9 @@ local Toggle = Tab:CreateToggle({
 					voteRetry()
 				end
 			end
-            toggleRewardsUI()
+			if RewardsUI.Enabled then
+				RewardsUI.Enabled = false 
+			end
             removeSaveToTeleport()
 			wait(1)
         end
