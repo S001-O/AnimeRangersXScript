@@ -298,7 +298,7 @@ local Toggle = Tab:CreateToggle({
         while AutoVoteOn do
             if not Values_VotePlaying.VoteEnded.Value then
                 if Values_VotePlaying.VoteEnabled.Value then
-                    wait(1)
+                    wait(3)
                     fireAutoVote()
                 end
             end
