@@ -420,7 +420,6 @@ end
 local function voteRetry()
 	toggleRewardsUI()
 	fireVoteRetryEvent()
-    end
 end
 
 local function removeSaveToTeleport()
