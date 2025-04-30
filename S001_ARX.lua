@@ -329,13 +329,12 @@ local Toggle = Tab:CreateToggle({
 })
 
 local function toggleRewardsUI()
-    if Values_VoteRetry.VoteEnabled.Value and not LoadingDataUI.Enabled then
-        RewardsUI.Enabled = true
-		RewardsUI.Enabled = false
-	else
-		if RewardsUI.Enabled then
-			RewardsUI.Enabled = false	
-		end
+	if Values_VoteRetry.VoteEnabled.Value and not LoadingDataUI.Enabled then
+		RewardsUI.Enabled = true
+		RewardsUI.Enabled = false	
+	end
+	if RewardsUI.Enabled then
+		RewardsUI.Enabled = false	
 	end
 end
 
@@ -356,7 +355,7 @@ local function voteRetry()
 end
 
 local function removeSaveToTeleport()
-    local SavedToTeleport = player:WaitForChild("SavedToTeleport")
+    local SavedToTeleport = player:FindFirstChild("SavedToTeleport")
     if SavedToTeleport then
         SavedToTeleport:Destroy()
     end
@@ -390,9 +389,7 @@ local Toggle = Tab:CreateToggle({
 					voteRetry()
 				end
 			end
-			if RewardsUI.Enabled then
-				RewardsUI.Enabled = false 
-			end
+			toggleRewardsUI()
             removeSaveToTeleport()
 			wait(1)
         end
