@@ -47,8 +47,8 @@ local JobId = game.JobId
 -- Player
 local player = Players.LocalPlayer
 local PlayerGui = player.PlayerGui
-local UserId = player.UserId
-local LocalPlayer = Players:GetPlayerByUserId(UserId)
+local playerUserId = player.UserId
+local LocalPlayer = Players:GetPlayerByUserId(playerUserId)
 local LocalPlayerGui = LocalPlayer.PlayerGui
 local playerName = player.Character
 
@@ -64,6 +64,8 @@ local AutoClickOn = false
 local AutoVoteOn = false
 local AutoNextOn = false
 local AutoJoinEasterEggEventOn = false
+local AutoRejoinOn = false
+local AutoJoinFriendsOn = false
 local AutoRedeemCodesOn = false
 
 -- Upgrades
@@ -126,6 +128,7 @@ end
 
 local function joinEasterEvent()
     createEasterEventLobby()
+	wait(3)
 	startMap()
 end
 
@@ -281,6 +284,77 @@ local Toggle = Tab:CreateToggle({
 	end,
 })
 
+local isRejoining = false
+
+local Divider = Tab:CreateDivider()
+local boolean = true
+local Toggle = Tab:CreateToggle({
+    Name = "Auto Rejoin",
+    CurrentValue = false,
+    Flag = "AutoRejoin_Toggle",
+    Callback = function(AutoRejoinEnabled)
+        AutoRejoinOn = AutoRejoinEnabled
+        while AutoRejoinOn do
+			local dt = DateTime.now()
+			local localTime = dt:ToLocalTime()
+			local currentMinute = localTime.Minute
+
+			if currentTime == 30 and not isRejoining then
+				isRejoining = true
+				player:Kick("\nRejoining...")
+				wait(1)
+				TeleportService:Teleport(PlaceId, player)
+			else
+				wait(60)
+			end
+			task.wait()
+		end
+
+    end,
+})
+
+local function JoinRoom(friend)
+    local args = {
+        "Join-Room",
+        {
+            Room = game:GetService("ReplicatedStorage"):WaitForChild("PlayRoom"):WaitForChild(friend)
+        }
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
+end
+
+local Toggle = Tab:CreateToggle({
+    Name = "Auto Join Friends",
+    CurrentValue = false,
+    Flag = "AutoJoinFriends_Toggle",
+    Callback = function(AutoJoinFriendsEnabled)
+		AutoJoinFriendsOn = AutoJoinFriendsEnabled
+		while AutoJoinFriendsOn do
+            for _,playersPlayer in ipairs(Players:GetChildren()) do
+                if player:isFriendsWith(playersPlayer.UserId) and not LocalPlayerGui.PlayRoom.Main.Game_Submit.Visible then
+                    JoinRoom(playersPlayer.Name)
+                    LocalPlayerGui.PlayRoom.Enabled = true
+                    task.wait(1)
+                end
+            end
+            task.wait()
+        end
+	end,
+})
+
+local Button = Tab:CreateButton({
+ 	Name = "Rejoin Server",
+ 	Callback = function()
+         if #Players:GetPlayers() <= 1 then
+             player:Kick("\nRejoining...")
+             wait(1)
+             TeleportService:Teleport(PlaceId, player)
+         else
+             TeleportService:TeleportToPlaceInstance(PlaceId, JobId, player)
+         end
+     end,
+ })
+ 
 -- Auto
 local Section = Tab:CreateSection("Automation")
 
