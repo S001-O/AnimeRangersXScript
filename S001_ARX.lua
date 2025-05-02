@@ -329,7 +329,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoJoinFriends_Toggle",
     Callback = function(AutoJoinFriendsEnabled)
 		AutoJoinFriendsOn = AutoJoinFriendsEnabled
-		while AutoJoinFriendsOn do
+		while AutoJoinFriendsOn and Values_Gamemode.Value == "" do
             for _,playersPlayer in ipairs(Players:GetChildren()) do
                 if player:isFriendsWith(playersPlayer.UserId) and not LocalPlayerGui.PlayRoom.Main.Game_Submit.Visible then
                     JoinRoom(playersPlayer.Name)
