@@ -284,7 +284,7 @@ local Toggle = Tab:CreateToggle({
 	end,
 })
 
-local isRejoining = false
+local serverId = nil
 
 local Divider = Tab:CreateDivider()
 
@@ -303,11 +303,15 @@ local Toggle = Tab:CreateToggle({
 			local currentMinute = localTime.Minute
 			local currentSecond = localTime.Second
 
+            if Values_Gamemode.Value == ""  then
+                serverId = JobId
+            end
+
 			if currentMinute == 30 or currentMinute == 00 then
 				lastRejoinTime = 60 - currentSecond
 				player:Kick("\nRejoining...")
 				wait(1)
-				TeleportService:Teleport(PlaceId, player)
+				TeleportService:TeleportToPlaceInstance(PlaceId, serverId, player)
 				wait(lastRejoinTime)
             end
 			lastRejoinTime = 0
