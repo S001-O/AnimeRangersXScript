@@ -287,28 +287,31 @@ local Toggle = Tab:CreateToggle({
 local isRejoining = false
 
 local Divider = Tab:CreateDivider()
-local boolean = true
+
+local lastRejoinTime = 0 -- Prevents spamming
+
 local Toggle = Tab:CreateToggle({
     Name = "Auto Rejoin",
     CurrentValue = false,
     Flag = "AutoRejoin_Toggle",
     Callback = function(AutoRejoinEnabled)
         AutoRejoinOn = AutoRejoinEnabled
-        while AutoRejoinOn do
+
+		while AutoRejoinOn do
 			local dt = DateTime.now()
 			local localTime = dt:ToLocalTime()
 			local currentMinute = localTime.Minute
+			local currentSecond = localTime.Second
 
-			if currentTime == 30 and not isRejoining then
-				isRejoining = true
+			if currentMinute == 30 or currentMinute == 00 then
+				lastRejoinTime = 60 - currentSecond
 				player:Kick("\nRejoining...")
 				wait(1)
 				TeleportService:Teleport(PlaceId, player)
-			else
-                isRejoining = false
-				wait(60)
-			end
-			task.wait()
+				wait(lastRejoinTime)
+            end
+			lastRejoinTime = 0
+			task.wait(10)
 		end
 
     end,
@@ -330,12 +333,14 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoJoinFriends_Toggle",
     Callback = function(AutoJoinFriendsEnabled)
 		AutoJoinFriendsOn = AutoJoinFriendsEnabled
-		while AutoJoinFriendsOn and Values_Gamemode.Value == "" do
-            for _,playersPlayer in ipairs(Players:GetChildren()) do
-                if player:isFriendsWith(playersPlayer.UserId) and not LocalPlayerGui.PlayRoom.Main.Game_Submit.Visible then
-                    JoinRoom(playersPlayer.Name)
-                    LocalPlayerGui.PlayRoom.Enabled = true
-                    task.wait(1)
+		while AutoJoinFriendsOn do
+            if Values_Gamemode.Value == "" then
+                for _,playersPlayer in ipairs(Players:GetChildren()) do
+                    if player:isFriendsWith(playersPlayer.UserId) and not LocalPlayerGui.PlayRoom.Main.Game_Submit.Visible then
+                        JoinRoom(playersPlayer.Name)
+                        LocalPlayerGui.PlayRoom.Enabled = true
+                        task.wait(1)
+                    end
                 end
             end
             task.wait()
