@@ -305,6 +305,7 @@ local Toggle = Tab:CreateToggle({
 				wait(1)
 				TeleportService:Teleport(PlaceId, player)
 			else
+                isRejoining = false
 				wait(60)
 			end
 			task.wait()
