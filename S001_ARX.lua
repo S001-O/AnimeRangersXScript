@@ -41,7 +41,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VirtualUser = cloneref(game:GetService("VirtualUser"))
 
 -- Game Variables
-local PlaceId = game.PlaceId
+local PlaceId = 72829404259339
 local JobId = game.JobId
 
 -- Player
@@ -284,8 +284,6 @@ local Toggle = Tab:CreateToggle({
 	end,
 })
 
-local serverId = nil
-
 local Divider = Tab:CreateDivider()
 
 local lastRejoinTime = 0 -- Prevents spamming
@@ -303,16 +301,10 @@ local Toggle = Tab:CreateToggle({
 			local currentMinute = localTime.Minute
 			local currentSecond = localTime.Second
 
-            if Values_Gamemode.Value == ""  then
-                serverId = JobId
-            end
-
 			if currentMinute == 30 or currentMinute == 00 then
 				lastRejoinTime = 60 - currentSecond
-				player:Kick("\nRejoining...")
-				wait(1)
-				TeleportService:TeleportToPlaceInstance(PlaceId, serverId, player)
-				wait(lastRejoinTime)
+                wait(lastRejoinTime)
+				TeleportService:Teleport(PlaceId, player)
             end
 			lastRejoinTime = 0
 			task.wait(10)
@@ -355,6 +347,7 @@ local Toggle = Tab:CreateToggle({
 local Button = Tab:CreateButton({
  	Name = "Rejoin Server",
  	Callback = function()
+    
          if #Players:GetPlayers() <= 1 then
              player:Kick("\nRejoining...")
              wait(1)
@@ -362,6 +355,7 @@ local Button = Tab:CreateButton({
          else
              TeleportService:TeleportToPlaceInstance(PlaceId, JobId, player)
          end
+		 
      end,
  })
  
