@@ -776,9 +776,10 @@ local Button = Tab:CreateButton({
 	Name = "Save Config",
 	Callback = function()
         ConfigurationSaving = {
+            Enabled = true,
             FolderName = "AnimeRangersX",
-            FileName = "AnimeRangersX_Save_0"
-        }
+            FileName = "AnimeRangersX_Save"
+          }
     end
 })
 
