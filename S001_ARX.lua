@@ -25,11 +25,11 @@ local Window = Rayfield:CreateWindow({
 	KeySettings = {
 	  Title = "S001 Key",
 	  Subtitle = "S001 Key System",
-	  Note = "Who's a good boy?",
+	  Note = "",
 	  FileName = "Key",
 	  SaveKey = true,
 	  GrabKeyFromSite = false,
-	  Key = {"me"}
+	  Key = {""}
 	}
 })
 
@@ -769,6 +769,23 @@ local Button = Tab:CreateButton({
 	Name = "InfiniteYield Script",
 	Callback = function()
         loadstring(game:HttpGet('https://raw.githubusercontent.com/edgeiy/infiniteyield/master/source'))()
+    end
+})
+
+local Button = Tab:CreateButton({
+	Name = "Save Config",
+	Callback = function()
+        ConfigurationSaving = {
+            FolderName = "AnimeRangersX",
+            FileName = "AnimeRangersX_Save_0"
+        }
+    end
+})
+
+local Button = Tab:CreateButton({
+	Name = "Load Config",
+	Callback = function()
+        Rayfield:LoadConfiguration()
     end
 })
 
