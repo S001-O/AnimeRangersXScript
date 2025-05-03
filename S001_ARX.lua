@@ -192,7 +192,7 @@ local Toggle = Tab:CreateToggle({
         while AutoJoinChallengeOn do
             if Values_Gamemode.Value == "" then
                 if AutoJoinRangerStageOn then
-                    wait(10)
+                    wait(20)
                     joinChallenge()
                 else
                     wait(3)
