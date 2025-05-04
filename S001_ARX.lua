@@ -183,7 +183,7 @@ local Toggle = Tab:CreateToggle({
 -- Auto Join Challenge
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Challenge",
-    ChangeValue = false,
+    CurrentValue = false,
     Flag = "AutoJoinChallenge_Toggle",
     Callback = function(AutoJoinChallengeEnabled)
 	
@@ -257,7 +257,7 @@ end
 
 local Toggle = Tab:CreateToggle({
     Name = "Auto Join Ranger Stage",
-    ChangeValue = false,
+    CurrentValue = false,
     Flag = "AutoJoinRangerStage_Toggle",
     Callback = function(AutoJoinRangerStageEnabled)
     
@@ -780,6 +780,8 @@ local Button = Tab:CreateButton({
             FolderName = "AnimeRangersX",
             FileName = "AnimeRangersX_Save"
           }
+
+          Rayfield:ConfigurationSave()
     end
 })
 
