@@ -1,4 +1,5 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
 local Window = Rayfield:CreateWindow({
 	Name = "S000 - AnimeRangersX",
 	Icon = 0,
@@ -11,26 +12,9 @@ local Window = Rayfield:CreateWindow({
 
 	ConfigurationSaving = {
 	  Enabled = true,
-	  FolderName = "AnimeRangersX",
-	  FileName = "AnimeRangersX_Save"
+	  FolderName = "S001-Rayfield",
+	  FileName = "AnimeRangersXSave"
 	},
-
-	Discord = {
-	  Enabled = false,
-	  Invite = "noinvitelink",
-	  RememberJoins = true
-	},
-
-	KeySystem = false,
-	KeySettings = {
-	  Title = "S001 Key",
-	  Subtitle = "S001 Key System",
-	  Note = "",
-	  FileName = "Key",
-	  SaveKey = true,
-	  GrabKeyFromSite = false,
-	  Key = {""}
-	}
 })
 
 -- Local variables
@@ -147,7 +131,7 @@ local function joinChallenge()
 	startMap()
 end
 
-local AutoJoinEasterEggEvent_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Join Easter Egg Event",
     CurrentValue = false,
     Flag = "AutoJoinEasterEggEvent_Toggle",
@@ -181,7 +165,7 @@ local AutoJoinEasterEggEvent_Toggle = Tab:CreateToggle({
     end,
 })
 -- Auto Join Challenge
-local AutoJoinChallenge_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Join Challenge",
     CurrentValue = false,
     Flag = "AutoJoinChallenge_Toggle",
@@ -255,7 +239,7 @@ local function submitChanges()
     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
 end
 
-local AutoJoinRangerStage_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Join Ranger Stage",
     CurrentValue = false,
     Flag = "AutoJoinRangerStage_Toggle",
@@ -288,7 +272,7 @@ local Divider = Tab:CreateDivider()
 
 local lastRejoinTime = 0 -- Prevents spamming
 
-local AutoRejoin_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Rejoin",
     CurrentValue = false,
     Flag = "AutoRejoin_Toggle",
@@ -323,7 +307,7 @@ local function JoinRoom(friend)
     game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(args))
 end
 
-local AutoJoinFriends_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Join Friends",
     CurrentValue = false,
     Flag = "AutoJoinFriends_Toggle",
@@ -344,7 +328,7 @@ local AutoJoinFriends_Toggle = Tab:CreateToggle({
 	end,
 })
 
-local RejoinButton = Tab:CreateButton({
+local Button = Tab:CreateButton({
  	Name = "Rejoin Server",
  	Callback = function()
     
@@ -367,7 +351,7 @@ local function fireAutoVote()
 end
 
 -- Auto Vote
-local AutoVote_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Vote",
     CurrentValue = false,
     Flag = "AutoVote_Toggle",
@@ -390,7 +374,7 @@ local function fireAutoNext()
 end
 
 -- Auto Next
-local AutoNext_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Auto Next",
     CurrentValue = false,
     Flag = "AutoNext_Toggle",
@@ -441,7 +425,7 @@ local function removeSaveToTeleport()
 end
 
 -- Auto Retry
-local AutoRetry_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Retry",
 	CurrentValue = false,
 	Flag = "AutoRetry_Toggle",
@@ -486,7 +470,7 @@ local function claimAllQuests(player_Name, quests_BoolValue_Name)
 end
 
 --  Auto Collect Quests
-local CollectQuest_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Collect Quests",
 	CurrentValue = false,
 	Flag = "CollectQuest_Toggle",
@@ -561,7 +545,7 @@ local function upgradeSlot(UnitLoadout)
 end
 
 -- Auto Upgrade Slot 1
-local AutoUpgradeSlot1_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Upgrade Slot 1",
 	CurrentValue = false,
 	Flag = "AutoUpgradeSlot1_Toggle",
@@ -579,7 +563,7 @@ local AutoUpgradeSlot1_Toggle = Tab:CreateToggle({
     end,
 })
 
-local AutoUpgradeSlot2_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Upgrade Slot 2",
 	CurrentValue = false,
 	Flag = "AutoUpgradeSlot2_Toggle",
@@ -597,7 +581,7 @@ local AutoUpgradeSlot2_Toggle = Tab:CreateToggle({
     end,
 })
 
-local AutoUpgradeSlot3_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Upgrade Slot 3",
 	CurrentValue = false,
 	Flag = "AutoUpgradeSlot3_Toggle",
@@ -615,7 +599,7 @@ local AutoUpgradeSlot3_Toggle = Tab:CreateToggle({
     end,
 })
 
-local AutoUpgradeSlot4_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Upgrade Slot 4",
 	CurrentValue = false,
 	Flag = "AutoUpgradeSlot4_Toggle",
@@ -633,7 +617,7 @@ local AutoUpgradeSlot4_Toggle = Tab:CreateToggle({
     end,
 })
 
-local AutoUpgradeSlot5_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Upgrade Slot 5",
 	CurrentValue = false,
 	Flag = "AutoUpgradeSlot5_Toggle",
@@ -651,7 +635,7 @@ local AutoUpgradeSlot5_Toggle = Tab:CreateToggle({
     end,
 })
 
-local AutoUpgradeSlot6_Toggle = Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
 	Name = "Auto Upgrade Slot 6",
 	CurrentValue = false,
 	Flag = "AutoUpgradeSlot6_Toggle",
