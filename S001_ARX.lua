@@ -139,7 +139,7 @@ local Toggle = Tab:CreateToggle({
 	
         AutoJoinEasterEggEventOn = AutoJoinEasterEggEventEnabled
 		
-		while AutoJoinEasterEggEventOn do
+		while AutoJoinEasterEggEventEnabled do
             if Values_Gamemode.Value == "" then
                 if AutoJoinChallengeOn and AutoJoinRangerStageOn then
                     wait(25)
@@ -173,7 +173,7 @@ local Toggle = Tab:CreateToggle({
 	
         AutoJoinChallengeOn = AutoJoinChallengeEnabled
 		
-        while AutoJoinChallengeOn do
+        while AutoJoinChallengeEnabled do
             if Values_Gamemode.Value == "" then
                 if AutoJoinRangerStageOn then
                     wait(20)
@@ -247,7 +247,7 @@ local Toggle = Tab:CreateToggle({
     
         AutoJoinRangerStageOn = AutoJoinRangerStageEnabled
         
-		while AutoJoinRangerStageOn do
+		while AutoJoinRangerStageEnabled do
 			if Values_Gamemode.Value == "" then
 				for world, rangerStage in pairs(AllWorlds) do
 					wait(0.5)
@@ -279,7 +279,7 @@ local Toggle = Tab:CreateToggle({
     Callback = function(AutoRejoinEnabled)
         AutoRejoinOn = AutoRejoinEnabled
 
-		while AutoRejoinOn do
+		while AutoRejoinEnabled do
 			local dt = DateTime.now()
 			local localTime = dt:ToLocalTime()
 			local currentMinute = localTime.Minute
@@ -313,7 +313,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoJoinFriends_Toggle",
     Callback = function(AutoJoinFriendsEnabled)
 		AutoJoinFriendsOn = AutoJoinFriendsEnabled
-		while AutoJoinFriendsOn do
+		while AutoJoinFriendsEnabled do
             if Values_Gamemode.Value == "" then
                 for _,playersPlayer in ipairs(Players:GetChildren()) do
                     if player:isFriendsWith(playersPlayer.UserId) and not LocalPlayerGui.PlayRoom.Main.Game_Submit.Visible then
@@ -357,7 +357,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoVote_Toggle",
     Callback = function(AutoVoteEnabled)
         AutoVoteOn = AutoVoteEnabled
-        while AutoVoteOn do
+        while AutoVoteEnabled do
             if not Values_VotePlaying.VoteEnded.Value then
                 if Values_VotePlaying.VoteEnabled.Value then
                     wait(3)
@@ -380,7 +380,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "AutoNext_Toggle",
     Callback = function(AutoNextEnabled)
         AutoNextOn = AutoNextEnabled
-        while AutoNextOn do
+        while AutoNextEnabled do
 			if Values_VoteNext.VoteEnabled.Value then
 				wait(1)
 				fireAutoNext()
@@ -433,7 +433,7 @@ local Toggle = Tab:CreateToggle({
     
         AutoRetryOn = AutoRetryEnabled
 
-        while AutoRetryOn do
+        while AutoRetryEnabled do
 			local dt = DateTime.now()
 			local localTime = dt:ToLocalTime()
 			local currentHour = localTime.Hour
@@ -552,7 +552,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot1Enabled)
         AutoUpgradeSlot1On = AutoUpgradeSlot1Enabled
 
-        while AutoUpgradeSlot1On do
+        while AutoUpgradeSlot1Enabled do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout1"
@@ -570,7 +570,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot2Enabled)
         AutoUpgradeSlot2On = AutoUpgradeSlot2Enabled
 
-        while AutoUpgradeSlot2On do
+        while AutoUpgradeSlot2Enabled do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout2"
@@ -588,7 +588,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot3Enabled)
         AutoUpgradeSlot3On = AutoUpgradeSlot3Enabled
 
-        while AutoUpgradeSlot3On do
+        while AutoUpgradeSlot3Enabled do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout3"
@@ -606,7 +606,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot4Enabled)
         AutoUpgradeSlot4On = AutoUpgradeSlot4Enabled
 
-        while AutoUpgradeSlot4On do
+        while AutoUpgradeSlot4Enabled do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout4"
@@ -624,7 +624,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot5Enabled)
         AutoUpgradeSlot5On = AutoUpgradeSlot5Enabled
 
-        while AutoUpgradeSlot5On do
+        while AutoUpgradeSlot5Enabled do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout5"
@@ -642,7 +642,7 @@ local Toggle = Tab:CreateToggle({
 	Callback = function(AutoUpgradeSlot6Enabled)
         AutoUpgradeSlot6On = AutoUpgradeSlot6Enabled
 
-        while AutoUpgradeSlot6On do
+        while AutoUpgradeSlot6Enabled do
 			wait(0.5)
             if Values_Game.Value then
             local UnitLoadout = "UnitLoadout6"
